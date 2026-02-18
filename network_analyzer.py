@@ -1,4 +1,5 @@
 from scapy.all import *
+import json
 
 # Get all Network Interfaces
 print(conf.ifaces)
@@ -76,3 +77,32 @@ for pkt_name in packet_count:
         packet_percentages.update({pkt_name: round(packet_count.get(pkt_name) / packet_count.get('Total') * 100, 2)})
 
 print("Packet Percentages: ", packet_percentages)
+
+
+
+# 4. Track top talkers for source & destination IP addresses
+sending_packets_addresses = {}
+receiving_packets_addresses = {}
+
+def track_ips(pkt):
+    if not pkt.haslayer('IP'):
+        return
+
+    if pkt['IP'].src in sending_packets_addresses:
+        if pkt['IP'].dst not in sending_packets_addresses[pkt['IP'].src]:
+            sending_packets_addresses[pkt['IP'].src].update({pkt['IP'].dst : 1})
+        else:
+            sending_packets_addresses[pkt['IP'].src][pkt['IP'].dst] += 1
+    else:
+        sending_packets_addresses[pkt['IP'].src] = {pkt['IP'].dst : 1}
+
+
+    if pkt['IP'].dst in receiving_packets_addresses:
+        if pkt['IP'].src not in receiving_packets_addresses[pkt['IP'].dst]:
+            receiving_packets_addresses[pkt['IP'].dst].update({pkt['IP'].src : 1})
+        else:
+            receiving_packets_addresses[pkt['IP'].dst][pkt['IP'].src] += 1
+    else:
+        receiving_packets_addresses[pkt['IP'].dst] = {pkt['IP'].src : 1}
+       
+sniff(timeout=10, prn=track_ips, iface='Software Loopback Interface 1')
