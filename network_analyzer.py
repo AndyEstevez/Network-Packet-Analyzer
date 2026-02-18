@@ -68,3 +68,11 @@ sniff(timeout=30, prn=counting_packets)
 
 print("Total Packet Count: ", packet_count)
 print("Total Packet Size: ", packet_size, "\n")
+
+packet_percentages = {'TCP': 0.00, 'UDP': 0.00, 'ICMP': 0.00, 'DNS': 0.00, 'ARP': 0.00, 'HTTP': 0.00, 'HTTPS': 0.00, 'SSDP': 0.00, 'Other': 0.00}
+
+for pkt_name in packet_count:
+    if pkt_name in packet_percentages:
+        packet_percentages.update({pkt_name: round(packet_count.get(pkt_name) / packet_count.get('Total') * 100, 2)})
+
+print("Packet Percentages: ", packet_percentages)
