@@ -134,3 +134,30 @@ for x, y in pie_packet_count.items():
 plt.pie(data, labels=labels)
 plt.savefig('pie_chart_protocol_distribution.png')
 plt.show()
+
+
+# ---- Bar Graph (top talkers)
+# TOP RECEIVERS 
+fig, ax = plt.subplots()
+sum_values = dict()
+for subdict in sending_packets_addresses.values():
+    for key, elem in subdict.items():
+        sum_values[key] = elem + sum_values.get(key, 0)
+
+print(sum_values)
+
+ips_labels = []
+data = []
+
+for x, y in sum_values.items():
+    if y > 100:
+        ips_labels.append(x)
+        data.append(y)
+
+bar_colors = ['tab:red', 'tab:blue', 'tab:orange', 'tab:green', 'tab:pink', 'tab:purple', 'tab:cyan', 'tab:gray', 'tab:olive', 'tab:brown']
+
+ax.bar(ips_labels, data, label=ips_labels, color=bar_colors)
+ax.set_title('Top IPs Receiving Packets')
+ax.legend(title='IP')
+plt.savefig('bar_graph_top_receivers.png')
+plt.show()
