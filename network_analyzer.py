@@ -106,3 +106,10 @@ def track_ips(pkt):
         receiving_packets_addresses[pkt['IP'].dst] = {pkt['IP'].src : 1}
        
 sniff(timeout=10, prn=track_ips, iface='Software Loopback Interface 1')
+
+pretty_dict1 = json.dumps(sending_packets_addresses, indent=4)
+pretty_dict2 = json.dumps(receiving_packets_addresses, indent=4)
+
+print(pretty_dict1)
+print("*"*50)
+print(pretty_dict2)
