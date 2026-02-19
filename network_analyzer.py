@@ -1,5 +1,8 @@
 from scapy.all import *
 import json
+import matplotlib.pyplot as plt
+import numpy as np
+import csv
 
 # Get all Network Interfaces
 print(conf.ifaces)
@@ -113,3 +116,21 @@ pretty_dict2 = json.dumps(receiving_packets_addresses, indent=4)
 print(pretty_dict1)
 print("*"*50)
 print(pretty_dict2)
+
+
+
+# 5. Data Visualization
+# ---- Pie Chart (protocol distribution)
+pie_packet_count = {k: v for k, v in sorted(packet_count.items(), key=lambda item: item[1])}
+pie_packet_count.pop('Total')
+data = []
+labels = []
+
+for x, y in pie_packet_count.items():
+    if y != 0:
+        labels.append(x)
+        data.append(y)
+
+plt.pie(data, labels=labels)
+plt.savefig('pie_chart_protocol_distribution.png')
+plt.show()
