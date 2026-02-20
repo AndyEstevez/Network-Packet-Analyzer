@@ -185,13 +185,3 @@ ax.set_title('Top IPs Sending Packets')
 ax.legend(title='IP')
 plt.savefig('bar_graph_top_senders.png')
 plt.show()
-
-
-
-# 6. Create csv files for analysis
-with open('protocol_distribution.csv', 'w', newline='') as csvfile:
-    fieldnames = ['protocol', 'total_packets']
-    writer = csv.writer(csvfile)
-    writer.writerow(fieldnames)
-    for key, value in packet_count.items():
-        writer.writerow([key, value])
