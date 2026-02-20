@@ -127,11 +127,13 @@ data = []
 labels = []
 
 for x, y in pie_packet_count.items():
-    if y != 0:
+    if y >= 10:
         labels.append(x)
         data.append(y)
 
-plt.pie(data, labels=labels)
+plt.title("Protocol Distribution")
+plt.pie(data, labels=labels, autopct='%1.1f%%')
+plt.legend(labels, loc="center left")
 plt.savefig('pie_chart_protocol_distribution.png')
 plt.show()
 
@@ -156,7 +158,7 @@ bar_colors = ['tab:red', 'tab:blue', 'tab:orange', 'tab:green', 'tab:pink', 'tab
 
 ax.bar(ips_labels, data, label=ips_labels, color=bar_colors)
 ax.set_title('Top IPs Receiving Packets')
-ax.legend(title='IP')
+ax.legend(ips_labels, title='IP', loc="center left")
 plt.savefig('bar_graph_top_receivers.png')
 plt.show()
 
@@ -183,3 +185,13 @@ ax.set_title('Top IPs Sending Packets')
 ax.legend(title='IP')
 plt.savefig('bar_graph_top_senders.png')
 plt.show()
+
+
+
+# 6. Create csv files for analysis
+with open('protocol_distribution.csv', 'w', newline='') as csvfile:
+    fieldnames = ['protocol', 'total_packets']
+    writer = csv.writer(csvfile)
+    writer.writerow(fieldnames)
+    for key, value in packet_count.items():
+        writer.writerow([key, value])
