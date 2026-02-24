@@ -29,9 +29,32 @@ print("Capturing TCP packets for 10 seconds: ", timer_packets, "\n")
 packet_count = {'TCP': 0, 'UDP': 0, 'ICMP': 0, 'DNS': 0, 'ARP': 0, 'HTTP': 0, 'HTTPS': 0, 'SSDP': 0, 'Other': 0, 'Total': 0}
 packet_size = {'TCP': 0, 'UDP': 0, 'ICMP': 0, 'DNS': 0, 'ARP': 0, 'HTTP': 0, 'HTTPS': 0, 'SSDP': 0, 'Total': 0}
 
+# write column names to csv
+fieldnames = ['Ethernet', 'IP', 'TCP/UDP', 'Raw']
+with open('live_capture.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(fieldnames)
+
+
 def counting_packets(pkt):
+    packet_dict = {}
     packet_count['Total'] += 1
     packet_size['Total'] += len(pkt['Ether'])
+
+    # add each packet to csv file for future analysis
+    with open('live_capture.csv', 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+
+        for line in pkt.show2(dump=True).split('\n'):
+            if '###' in line:
+                layer = line.strip('#[] ')
+                packet_dict[layer] = {}
+            elif '=' in line:
+                key, val = line.split('=', 1)
+                packet_dict[layer][key.strip()] = val.strip()
+        
+        writer.writerow(packet_dict.values())
+
 
     if pkt.haslayer('TCP'):
         packet_count['TCP'] += 1
@@ -68,7 +91,7 @@ def counting_packets(pkt):
         packet_count['Other'] += 1
 
 print("Capturing and analyzing packets for 60 seconds")
-sniff(timeout=30, prn=counting_packets)
+sniff(timeout=60, prn=counting_packets)
 
 print("Total Packet Count: ", packet_count)
 print("Total Packet Size: ", packet_size, "\n")
@@ -108,7 +131,7 @@ def track_ips(pkt):
     else:
         receiving_packets_addresses[pkt['IP'].dst] = {pkt['IP'].src : 1}
        
-sniff(timeout=10, prn=track_ips, iface='Software Loopback Interface 1')
+sniff(timeout=30, prn=track_ips)
 
 pretty_dict1 = json.dumps(sending_packets_addresses, indent=4)
 pretty_dict2 = json.dumps(receiving_packets_addresses, indent=4)
@@ -150,15 +173,16 @@ ips_labels = []
 data = []
 
 for x, y in sum_values.items():
-    if y > 100:
+    if y > 50:
         ips_labels.append(x)
         data.append(y)
 
 bar_colors = ['tab:red', 'tab:blue', 'tab:orange', 'tab:green', 'tab:pink', 'tab:purple', 'tab:cyan', 'tab:gray', 'tab:olive', 'tab:brown']
 
+ax.set(ylabel='Total Received Packets')
 ax.bar(ips_labels, data, label=ips_labels, color=bar_colors)
 ax.set_title('Top IPs Receiving Packets')
-ax.legend(ips_labels, title='IP', loc="center left")
+ax.legend(ips_labels, title='IP')
 plt.savefig('bar_graph_top_receivers.png')
 plt.show()
 
@@ -174,12 +198,13 @@ ips_labels = []
 data = []
 
 for x, y in sum_values.items():
-    if y > 100:
+    if y > 50:
         ips_labels.append(x)
         data.append(y)
 
 bar_colors = ['tab:red', 'tab:blue', 'tab:orange', 'tab:green', 'tab:pink', 'tab:purple', 'tab:cyan', 'tab:gray', 'tab:olive', 'tab:brown']
 
+ax.set(ylabel='Total Sent Packets')
 ax.bar(ips_labels, data, label=ips_labels, color=bar_colors)
 ax.set_title('Top IPs Sending Packets')
 ax.legend(title='IP')
