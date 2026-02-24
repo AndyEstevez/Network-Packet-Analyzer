@@ -5,6 +5,7 @@ import numpy as np
 import csv
 
 # Get all Network Interfaces
+print("Network Interfaces on this device:")
 print(conf.ifaces)
 
 # Names of my Network Interfaces
