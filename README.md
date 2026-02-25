@@ -15,4 +15,7 @@
 
 
 ### Results
-- 
+- Used Scapy for packet capturing from network interfaces
+- Data Visualizations done through Matplotlib
+- Bar Graphs and Pie Chart for protocol distribution, top talkers for IPs
+- Save live packet capture into csv files for further analysis
